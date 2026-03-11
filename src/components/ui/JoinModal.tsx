@@ -4,9 +4,10 @@ import { useState } from 'react';
 
 interface Props {
   onClose: () => void;
+  onJoined?: (wallet: string) => void;
 }
 
-export default function JoinModal({ onClose }: Props) {
+export default function JoinModal({ onClose, onJoined }: Props) {
   const [wallet, setWallet] = useState('');
   const [name, setName] = useState('');
   const [submitted, setSubmitted] = useState(false);
@@ -25,6 +26,7 @@ export default function JoinModal({ onClose }: Props) {
       });
       if (res.ok) {
         setSubmitted(true);
+        onJoined?.(wallet.trim());
       } else {
         const d = await res.json().catch(() => ({}));
         setError(d.error || 'Something went wrong');

@@ -310,39 +310,101 @@ async function generateConversationWithLLM(
 function generateConversationTemplate(
   agent: Agent, other: Agent, action: string, locationId: string,
 ): { agent_id: string; agent_name: string; content: string }[] {
+  const a1 = agent.name.split(' ')[0];
+  const a2 = other.name.split(' ')[0];
+
   const greetings = [
-    `Hey ${other.name.split(' ')[0]}!`,
-    `Morning, ${other.name.split(' ')[0]}.`,
-    `Oh, ${other.name.split(' ')[0]}! Good to see you.`,
-    `${other.name.split(' ')[0]}, how's it going?`,
+    `Hey ${a2}!`,
+    `Morning, ${a2}.`,
+    `Oh, ${a2}! Good to see you.`,
+    `${a2}, how's it going?`,
+    `There you are, ${a2}. Been looking for you.`,
+    `${a2}! Just the person I wanted to see.`,
+    `Well if it isn't ${a2}.`,
+    `Fancy running into you here, ${a2}.`,
   ];
   const responses = [
     `Hey! Not bad, just ${other.current_action}.`,
     `Oh hi! Pretty good, thanks.`,
     `Can't complain. Busy day though.`,
     `Good to see you too! What brings you here?`,
+    `${a1}! I was just thinking about you.`,
+    `Hey yourself. Long day.`,
+    `Oh hey. Pull up a chair.`,
+    `Not bad, not bad. How about you?`,
   ];
   const topics: Record<string, string[][]> = {
     tavern: [
       [`Have you tried the new chowder?`, `Not yet, is it any good?`],
       [`Busy night tonight.`, `Yeah, everyone's out.`],
+      [`I heard Bruno's testing a new recipe.`, `Oh? Last time that happened we all got stomach aches.`],
+      [`Katy was telling me the funniest story earlier.`, `She always has the best gossip.`],
+      [`Think the mayor will stop by tonight?`, `Agnes? She usually does after a long day.`],
+      [`This place really comes alive at night.`, `Best tavern on the island. Only tavern, but still.`],
+      [`Another round?`, `You read my mind.`],
+      [`I swear the chowder gets better every week.`, `Bruno's been experimenting. Don't tell him I said that.`],
     ],
     market: [
       [`Prices seem high today.`, `Supply's been low this week.`],
       [`Seen anything good at the stalls?`, `Luna has some nice shells.`],
+      [`The market feels busier than usual.`, `Word is a shipment came in at the docks.`],
+      [`I need to pick up some supplies.`, `Check Luna's stall — she had a good haul yesterday.`],
+      [`Have you noticed the new vendor?`, `Which one? The one with the strange herbs?`],
+      [`MOLTTOWN prices are going up.`, `Everyone's been mining hard this week.`],
+      [`I love market days.`, `Me too. You can learn everything about the town just by standing here.`],
     ],
     farm: [
       [`The crops are looking great this season.`, `Bob knows what he's doing.`],
       [`Think we'll get rain soon?`, `Hope so, the soil's getting dry.`],
+      [`Smell that? Fresh earth. Nothing better.`, `You sound like Bob. He says the same thing every morning.`],
+      [`The windmill needs some repairs.`, `I'll mention it to Gus. He can fix anything.`],
+      [`Look at those sunflowers.`, `Cedar planted those last season. Beautiful, aren't they?`],
+      [`Hard work out here, but honest work.`, `That's the farmer's life.`],
     ],
     docks: [
       [`Catch anything today?`, `A few, but nothing special.`],
       [`The tide's coming in fast.`, `Better secure the boats.`],
+      [`See that ship on the horizon?`, `Could be traders. Or could be nothing.`],
+      [`Finn told me about a fish the size of a barrel.`, `That man's stories get bigger every day.`],
+      [`The sea air always clears my head.`, `Same. I come here whenever I need to think.`],
+      [`Storm coming?`, `The clouds are building. Could be a rough night.`],
+      [`The docks need some work. Planks are getting soft.`, `I'll bring it up at the next town meeting.`],
+    ],
+    beach: [
+      [`The sunset from here is something else.`, `Best view on the island.`],
+      [`Found any good shells today?`, `A few. Luna might want them for her stall.`],
+      [`I could sit here all day.`, `Don't let the mayor catch you slacking.`],
+      [`The water's warm today.`, `Perfect weather. Wish every day was like this.`],
+      [`Cedar keeps this beach spotless.`, `That man loves this island more than anyone.`],
+    ],
+    smithy: [
+      [`What's Gus working on today?`, `Some kind of tool. He won't say what.`],
+      [`The heat from that forge is intense.`, `You get used to it. Gus doesn't even break a sweat.`],
+      [`I ordered a new blade last week.`, `Gus does fine work. It'll be worth the wait.`],
+      [`The sound of the hammer is oddly soothing.`, `Until you've heard it for eight hours straight.`],
+    ],
+    mayor: [
+      [`Agnes has been busy lately.`, `Running a town is no small task.`],
+      [`Think the mayor would approve the new dock plan?`, `Hard to say. She's cautious with the budget.`],
+      [`The mayor's house always looks so proper.`, `Agnes runs a tight ship. Town and home.`],
+    ],
+    lighthouse: [
+      [`Can you see the mainland from up there?`, `On a clear day, yes. It's beautiful.`],
+      [`Mira's been keeping watch for years.`, `This island wouldn't be the same without her.`],
+      [`The light was flickering last night.`, `Mira fixed it by dawn. She always does.`],
+      [`It must get lonely up here.`, `Mira says the stars keep her company.`],
     ],
     default: [
       [`How's work been?`, `Same as always. You?`],
       [`Nice weather today.`, `Yeah, perfect for being outside.`],
       [`Heard any news?`, `Nothing much. Quiet day.`],
+      [`This island gets more interesting every day.`, `Never a dull moment in Molt Town.`],
+      [`I've been mining a lot of MOLTTOWN lately.`, `Same here. The economy's booming.`],
+      [`Did you see the Moltbook post from earlier?`, `Ha! Yeah, that was something.`],
+      [`I should visit the tavern later.`, `I'll join you. Could use a break.`],
+      [`What do you think of the new workers in town?`, `Fresh faces are always welcome. More hands, more tokens.`],
+      [`Sometimes I forget how small this island is.`, `Small, but it's home.`],
+      [`The town's really grown lately.`, `More people, more stories. I like it.`],
     ],
   };
 

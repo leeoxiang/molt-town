@@ -8,6 +8,7 @@ import EventLog from '@/components/ui/EventLog';
 import MiningLog from '@/components/ui/MiningLog';
 import ProfileModal from '@/components/ui/ProfileModal';
 import JoinModal from '@/components/ui/JoinModal';
+import AboutModal from '@/components/ui/AboutModal';
 
 const GameCanvas = dynamic(() => import('@/components/game/GameCanvas'), {
   ssr: false,
@@ -31,6 +32,8 @@ export default function Home() {
   const [rightOpen, setRightOpen] = useState(true);
   const [showProfile, setShowProfile] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
+  const [showAbout, setShowAbout] = useState(false);
+  const [myWallet, setMyWallet] = useState<string | null>(null);
 
   const handleAgentClick = useCallback((id: string) => {
     setSelectedId(id);
@@ -44,6 +47,16 @@ export default function Home() {
 
   // Sort agents by balance for leaderboard feel
   const sortedAgents = useMemo(() => [...agents].sort((a, b) => (b.molt_balance || 0) - (a.molt_balance || 0)), [agents]);
+
+  // Find user's worker by wallet
+  const myWorker = useMemo(() => {
+    if (!myWallet) return null;
+    const workerId = `worker_${myWallet.slice(0, 8).toLowerCase()}`;
+    return agents.find(a => a.id === workerId) || null;
+  }, [myWallet, agents]);
+
+  // Default resident IDs (non-workers)
+  const defaultResidents = new Set(['agnes', 'finn', 'bob', 'katy', 'gus', 'mira', 'pip', 'bruno', 'luna', 'cedar']);
 
   return (
     <div className="h-screen flex flex-col overflow-hidden bg-[#0e0a04]">
@@ -82,6 +95,13 @@ export default function Home() {
           <span className="text-[9px] text-[#7a6b55] font-mono uppercase">{isLive ? 'Live' : 'Offline'}</span>
         </div>
 
+        <button
+          onClick={() => setShowAbout(true)}
+          className="text-[9px] text-[#7a6b55] hover:text-[#c4a46c] transition font-semibold px-2 py-1 rounded hover:bg-[#1a1408] border border-transparent hover:border-[#3a2f1a]"
+        >
+          About
+        </button>
+
         <div className="flex items-center gap-2 mr-2">
           {[
             { href: 'https://github.com/leeoxiang/molt-town', img: 'https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/6983ebadee1a5bb66150c566_69093cba0db485064d0267ca_68d5c1872568958fd78018bb_twitter%20(1).png', alt: 'GitHub' },
@@ -115,28 +135,54 @@ export default function Home() {
                   <span className="text-[9px] text-[#7a6b55] uppercase tracking-wider font-bold">Residents</span>
                   <button onClick={() => setLeftOpen(false)} className="text-[#5a4a30] hover:text-[#c4a46c] text-[10px] px-1">&lt;</button>
                 </div>
-                <div className="px-2 pb-2 space-y-0.5 max-h-[280px] overflow-y-auto">
-                  {sortedAgents.map(a => (
+
+                {/* My Worker shortcut */}
+                {myWorker && (
+                  <div className="px-2 pb-1.5">
                     <button
-                      key={a.id}
-                      onClick={() => handleAgentClick(a.id)}
-                      className={`w-full text-left px-2 py-1.5 rounded transition-all text-[10px] ${
-                        selectedId === a.id
-                          ? 'bg-[#6b4226]/20 border border-[#6b4226]/50'
-                          : 'hover:bg-[#1a1408] border border-transparent'
-                      }`}
+                      onClick={() => handleAgentClick(myWorker.id)}
+                      className="w-full text-left px-2 py-1.5 rounded bg-[#6b4226]/15 border border-[#6b4226]/40 text-[10px] hover:bg-[#6b4226]/25 transition-all"
                     >
                       <div className="flex items-center gap-2">
-                        <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${a.current_action === 'sleep' ? 'bg-[#5a4a30]' : 'bg-emerald-500'}`} />
-                        <span className="font-semibold text-[#e8d5b0] truncate">{a.name.split(' ')[0]}</span>
-                        <span className="pixel-font text-[8px] text-[#f5c842] ml-auto">{(a.molt_balance || 0).toFixed(0)}</span>
-                      </div>
-                      <div className="flex items-center gap-2 mt-0.5 pl-3.5">
-                        <span className="text-[#7a6b55] truncate">{a.job}</span>
-                        <span className="text-[#3a2f1a] truncate ml-auto">{a.current_action}</span>
+                        <span className="text-[8px] bg-[#f5c842]/20 text-[#f5c842] px-1 py-0.5 rounded font-bold uppercase">You</span>
+                        <span className="font-semibold text-[#f5e6c8] truncate">{myWorker.name}</span>
+                        <span className="pixel-font text-[8px] text-[#f5c842] ml-auto">{(myWorker.molt_balance || 0).toFixed(0)}</span>
                       </div>
                     </button>
-                  ))}
+                  </div>
+                )}
+
+                <div className="px-2 pb-2 space-y-0.5 max-h-[280px] overflow-y-auto">
+                  {sortedAgents.map(a => {
+                    const isWorker = !defaultResidents.has(a.id);
+                    const isMe = myWorker?.id === a.id;
+                    return (
+                      <button
+                        key={a.id}
+                        onClick={() => handleAgentClick(a.id)}
+                        className={`w-full text-left px-2 py-1.5 rounded transition-all text-[10px] ${
+                          selectedId === a.id
+                            ? 'bg-[#6b4226]/20 border border-[#6b4226]/50'
+                            : 'hover:bg-[#1a1408] border border-transparent'
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${a.current_action === 'sleep' ? 'bg-[#5a4a30]' : 'bg-emerald-500'}`} />
+                          <span className={`font-semibold truncate ${isMe ? 'text-[#f5c842]' : 'text-[#e8d5b0]'}`}>{a.name.split(' ')[0]}</span>
+                          {isWorker && (
+                            <span className="text-[7px] bg-[#c4a46c]/15 text-[#c4a46c] px-1 py-0.5 rounded font-bold uppercase shrink-0">
+                              {isMe ? 'you' : 'worker'}
+                            </span>
+                          )}
+                          <span className="pixel-font text-[8px] text-[#f5c842] ml-auto">{(a.molt_balance || 0).toFixed(0)}</span>
+                        </div>
+                        <div className="flex items-center gap-2 mt-0.5 pl-3.5">
+                          <span className="text-[#7a6b55] truncate">{a.job}</span>
+                          <span className="text-[#3a2f1a] truncate ml-auto">{a.current_action}</span>
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
               <div className="flex-1 flex flex-col min-h-0">
@@ -211,7 +257,12 @@ export default function Home() {
 
       {/* Join Modal */}
       {showJoin && (
-        <JoinModal onClose={() => setShowJoin(false)} />
+        <JoinModal onClose={() => setShowJoin(false)} onJoined={(w) => setMyWallet(w)} />
+      )}
+
+      {/* About Modal */}
+      {showAbout && (
+        <AboutModal onClose={() => setShowAbout(false)} />
       )}
     </div>
   );
