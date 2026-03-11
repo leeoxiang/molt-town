@@ -99,26 +99,26 @@ export default function Home() {
           <span className="text-[#a08050] font-bold">MOLTTOWN</span>
           <span className="text-[#5a4a30] text-[9px]">mined</span>
           <div className="h-3 w-px bg-[#3a2f1a] mx-0.5" />
-          <div className="flex items-center gap-2 text-[8px] font-mono tracking-tight">
-            <div className="flex flex-col items-center leading-none">
-              <span className="text-[#8a7b65] font-semibold">{blockHeight}</span>
-              <span className="text-[#3a2f1a] text-[7px] uppercase">Block</span>
+          <div className="flex items-center gap-3 text-[10px] font-mono">
+            <div className="flex flex-col items-center leading-tight">
+              <span className="text-[#a89070] font-semibold">{blockHeight}</span>
+              <span className="text-[#5a4a30] text-[8px] uppercase">Block</span>
             </div>
-            <div className="flex flex-col items-center leading-none">
-              <span className="text-[#8a7b65] font-semibold">{epoch}</span>
-              <span className="text-[#3a2f1a] text-[7px] uppercase">Epoch</span>
+            <div className="flex flex-col items-center leading-tight">
+              <span className="text-[#a89070] font-semibold">{epoch}</span>
+              <span className="text-[#5a4a30] text-[8px] uppercase">Epoch</span>
             </div>
-            <div className="flex flex-col items-center leading-none">
-              <span className="text-[#8a7b65] font-semibold">{activeWorkers}<span className="text-[#3a2f1a]">/{totalWorkers}</span></span>
-              <span className="text-[#3a2f1a] text-[7px] uppercase">Workers</span>
+            <div className="flex flex-col items-center leading-tight">
+              <span className="text-[#a89070] font-semibold">{activeWorkers}<span className="text-[#5a4a30]">/{totalWorkers}</span></span>
+              <span className="text-[#5a4a30] text-[8px] uppercase">Workers</span>
             </div>
-            <div className="flex flex-col items-center leading-none">
+            <div className="flex flex-col items-center leading-tight">
               <span className="text-[#c4a46c] font-semibold">{avgReward.toFixed(1)}</span>
-              <span className="text-[#3a2f1a] text-[7px] uppercase">Reward</span>
+              <span className="text-[#5a4a30] text-[8px] uppercase">Reward</span>
             </div>
-            <div className="flex flex-col items-center leading-none">
+            <div className="flex flex-col items-center leading-tight">
               <span className="text-emerald-500 font-semibold">{hashrate}</span>
-              <span className="text-[#3a2f1a] text-[7px] uppercase">H/s</span>
+              <span className="text-[#5a4a30] text-[8px] uppercase">H/s</span>
             </div>
           </div>
         </div>
