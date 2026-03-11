@@ -9,6 +9,7 @@ import MiningLog from '@/components/ui/MiningLog';
 import ProfileModal from '@/components/ui/ProfileModal';
 import JoinModal from '@/components/ui/JoinModal';
 import AboutModal from '@/components/ui/AboutModal';
+import MusicPlayer from '@/components/ui/MusicPlayer';
 
 const GameCanvas = dynamic(() => import('@/components/game/GameCanvas'), {
   ssr: false,
@@ -44,6 +45,17 @@ export default function Home() {
   const timeName = hour >= 5 && hour < 8 ? 'Dawn' : hour >= 8 && hour < 12 ? 'Morning' : hour >= 12 && hour < 14 ? 'Midday' : hour >= 14 && hour < 18 ? 'Afternoon' : hour >= 18 && hour < 21 ? 'Evening' : 'Night';
 
   const totalMolt = useMemo(() => agents.reduce((s, a) => s + (a.molt_balance || 0), 0), [agents]);
+
+  // Mining stats derived from real data
+  const blockHeight = tick?.id ?? 0;
+  const epoch = tick?.sim_day ?? 1;
+  const activeWorkers = useMemo(() => agents.filter(a => a.current_action !== 'sleep').length, [agents]);
+  const totalWorkers = agents.length;
+  const avgReward = useMemo(() => {
+    if (!rewards.length) return 0;
+    return rewards.reduce((s, r) => s + r.amount, 0) / rewards.length;
+  }, [rewards]);
+  const hashrate = useMemo(() => (activeWorkers * 1.47).toFixed(2), [activeWorkers]);
 
   // Sort agents by balance for leaderboard feel
   const sortedAgents = useMemo(() => [...agents].sort((a, b) => (b.molt_balance || 0) - (a.molt_balance || 0)), [agents]);
@@ -82,10 +94,19 @@ export default function Home() {
 
         <div className="h-4 w-px bg-[#3a2f1a]" />
 
-        <div className="flex items-center gap-1.5 text-[10px]">
-          <span className="pixel-font text-[9px] text-[#f5c842] font-bold glow-gold">{totalMolt.toFixed(0)}</span>
-          <span className="text-[#a08050] font-bold">MOLTTOWN</span>
-          <span className="text-[#5a4a30]">mined</span>
+        <div className="flex items-center gap-3 text-[10px]">
+          <div className="flex items-center gap-1.5">
+            <span className="pixel-font text-[9px] text-[#f5c842] font-bold glow-gold">{totalMolt.toFixed(0)}</span>
+            <span className="text-[#a08050] font-bold">MOLTTOWN</span>
+          </div>
+          <div className="h-3 w-px bg-[#3a2f1a]" />
+          <div className="flex items-center gap-2.5 text-[9px] font-mono">
+            <span className="text-[#5a4a30]">Block <span className="text-[#8a7b65]">{blockHeight}</span></span>
+            <span className="text-[#5a4a30]">Epoch <span className="text-[#8a7b65]">{epoch}</span></span>
+            <span className="text-[#5a4a30]">Workers <span className="text-[#8a7b65]">{activeWorkers}<span className="text-[#3a2f1a]">/{totalWorkers}</span></span></span>
+            <span className="text-[#5a4a30]">Reward <span className="text-[#c4a46c]">{avgReward.toFixed(1)}</span></span>
+            <span className="text-[#5a4a30]">H/s <span className="text-emerald-600">{hashrate}</span></span>
+          </div>
         </div>
 
         <div className="flex-1" />
@@ -94,6 +115,8 @@ export default function Home() {
           <div className={`w-1.5 h-1.5 rounded-full ${isLive ? 'bg-emerald-500 animate-pulse' : 'bg-[#5a4a30]'}`} />
           <span className="text-[9px] text-[#7a6b55] font-mono uppercase">{isLive ? 'Live' : 'Offline'}</span>
         </div>
+
+        <MusicPlayer />
 
         <button
           onClick={() => setShowAbout(true)}
