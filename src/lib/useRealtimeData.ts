@@ -134,13 +134,13 @@ export function useRealtimeData(): RealtimeData & {
     setIsRunning(false);
   }, [isRunning, fetchAll, isLive]);
 
-  // Auto-play (default on, 8s interval for more natural pacing)
+  // Auto-play (default on, 18s interval — slow enough for conversations to play out)
   useEffect(() => { autoRef.current = autoPlay; }, [autoPlay]);
   useEffect(() => {
     if (!autoPlay) return;
     const iv = setInterval(() => {
       if (autoRef.current && !isRunning) triggerTick();
-    }, 8000);
+    }, 18000);
     return () => clearInterval(iv);
   }, [autoPlay, isRunning, triggerTick]);
 

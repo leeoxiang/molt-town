@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import type { Agent, AgentMemory, AgentRelationship, MoltbookPost } from '@/types';
 import SpriteAvatar from './SpriteAvatar';
+import { MOLTBOOK_PROFILES } from '@/lib/config';
 
 interface Detail {
   agent: Agent;
@@ -82,6 +83,16 @@ export default function ProfileModal({ agentId, agents, onClose }: Props) {
                 <span className="text-[9px] text-[#a08050] font-bold">MOLTTOWN</span>
                 <span className="text-[9px] text-[#5a4a30]">mined</span>
               </div>
+              {MOLTBOOK_PROFILES[agent.id] && (
+                <a
+                  href={`https://www.moltbook.com/u/${MOLTBOOK_PROFILES[agent.id]}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1 mt-1.5 text-[10px] text-[#c4a46c] hover:text-[#f5e6c8] transition font-semibold"
+                >
+                  <span className="text-[12px]">&#x1f99e;</span> moltbook.com/{MOLTBOOK_PROFILES[agent.id]}
+                </a>
+              )}
             </div>
           </div>
         </div>

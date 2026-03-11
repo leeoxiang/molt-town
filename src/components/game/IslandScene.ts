@@ -613,7 +613,11 @@ export default class IslandScene extends Phaser.Scene {
   }
 
   // ── Speech bubbles (parchment style) ──
+  private convoQueue: Conversation[] = [];
+  private convoPlaying = false;
+
   showConversations(conversations: Conversation[]) {
+    // Queue new conversations to stagger them naturally
     for (const convo of conversations) {
       if (this.seenConvoIds.has(convo.id)) continue;
       this.seenConvoIds.add(convo.id);
@@ -621,36 +625,56 @@ export default class IslandScene extends Phaser.Scene {
       const messages = convo.messages as ConversationMessage[];
       if (!messages || messages.length === 0) continue;
 
-      // Make participants face each other and stop
-      const participantIds = messages.map(m => m.agent_id).filter((v, i, a) => a.indexOf(v) === i);
+      this.convoQueue.push(convo);
+    }
+
+    this.playNextConvo();
+  }
+
+  private playNextConvo() {
+    if (this.convoPlaying || this.convoQueue.length === 0) return;
+    this.convoPlaying = true;
+
+    const convo = this.convoQueue.shift()!;
+    const messages = convo.messages as ConversationMessage[];
+
+    // Make participants face each other and stop
+    const participantIds = messages.map(m => m.agent_id).filter((v, i, a) => a.indexOf(v) === i);
+    for (const pid of participantIds) {
+      const as = this.agentSprites.get(pid);
+      if (as) {
+        as.state = 'talking';
+        as.talkingTo = participantIds.find(id => id !== pid) || undefined;
+      }
+    }
+
+    // Sequence speech bubbles with slower, more natural timing
+    messages.forEach((msg, i) => {
+      this.time.delayedCall(i * 4500, () => {
+        this.showBubble(msg.agent_id, msg.content);
+      });
+    });
+
+    // Release agents after all messages, then play next convo after a gap
+    const totalDuration = messages.length * 4500 + 4000;
+    this.time.delayedCall(totalDuration, () => {
       for (const pid of participantIds) {
         const as = this.agentSprites.get(pid);
-        if (as) {
-          as.state = 'talking';
-          as.talkingTo = participantIds.find(id => id !== pid) || undefined;
+        if (as && as.state === 'talking') {
+          as.state = 'idle';
+          as.idleUntil = this.time.now + IDLE_MIN_MS;
+          as.talkingTo = undefined;
         }
       }
+      this.convoPlaying = false;
 
-      // Sequence speech bubbles with natural timing
-      messages.forEach((msg, i) => {
-        this.time.delayedCall(i * 3500, () => {
-          this.showBubble(msg.agent_id, msg.content);
+      // Wait a beat before starting the next conversation
+      if (this.convoQueue.length > 0) {
+        this.time.delayedCall(3000 + Math.random() * 4000, () => {
+          this.playNextConvo();
         });
-      });
-
-      // Release agents after all messages
-      const totalDuration = messages.length * 3500 + 3000;
-      this.time.delayedCall(totalDuration, () => {
-        for (const pid of participantIds) {
-          const as = this.agentSprites.get(pid);
-          if (as && as.state === 'talking') {
-            as.state = 'idle';
-            as.idleUntil = this.time.now + IDLE_MIN_MS;
-            as.talkingTo = undefined;
-          }
-        }
-      });
-    }
+      }
+    });
   }
 
   private showBubble(agentId: string, text: string) {

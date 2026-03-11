@@ -1,5 +1,6 @@
 import { getServiceSupabase } from './supabase';
 import { resetTickCalls, generateSpeechLine, generatePostText, generateThought as llmThought } from './openrouter';
+import { postToMoltbook } from './moltbook-api';
 import type { Agent, ScheduleEntry, AgentRelationship, MoltbookPost } from '@/types';
 
 const db = () => getServiceSupabase();
@@ -192,9 +193,9 @@ async function processAgent(
     rewardTotal += REWARDS.movement;
   }
 
-  // Interactions — personality-driven chance
-  const interactChance = 0.25 + (personality.sociable * 0.06);
-  if (colocated.length > 0 && Math.random() < clamp(interactChance, 0.08, 0.55)) {
+  // Interactions — personality-driven chance (kept low so conversations feel staggered)
+  const interactChance = 0.12 + (personality.sociable * 0.04);
+  if (colocated.length > 0 && Math.random() < clamp(interactChance, 0.05, 0.30)) {
     // Sociable agents prefer friends; introverted pick randomly
     let other: Agent;
     if (personality.sociable > 1 && relationships.length > 0) {
@@ -253,6 +254,13 @@ async function processAgent(
       });
       event = `${agent.name} posted on Moltbook`;
       rewardTotal += REWARDS.post;
+
+      // Cross-post to moltbook.com (fire-and-forget, never blocks tick)
+      postToMoltbook(
+        agent.id,
+        `${agent.name} — ${agent.job} at ${newLocationId}`,
+        postContent,
+      ).catch(() => {});
     }
   }
 

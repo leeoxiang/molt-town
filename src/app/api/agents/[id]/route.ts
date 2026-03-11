@@ -35,8 +35,16 @@ export async function GET(
     return NextResponse.json({ error: agentRes.error.message }, { status: 404 });
   }
 
+  // Normalize JSONB fields that may have been double-encoded as strings
+  const agent = agentRes.data;
+  for (const field of ['traits', 'goals', 'schedule'] as const) {
+    if (typeof agent[field] === 'string') {
+      try { agent[field] = JSON.parse(agent[field]); } catch { agent[field] = []; }
+    }
+  }
+
   return NextResponse.json({
-    agent: agentRes.data,
+    agent,
     memories: memoriesRes.data || [],
     relationships: relationshipsRes.data || [],
     posts: postsRes.data || [],

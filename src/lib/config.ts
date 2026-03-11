@@ -73,3 +73,17 @@ export const WANDER_CHANCE = 0.35; // chance to wander after idle pause
 
 export const MEMORY_WINDOW = 50;
 export const HOURS_PER_DAY = 24;
+
+// Agent ID → Moltbook.com username (for profile links in UI)
+export const MOLTBOOK_PROFILES: Record<string, string> = {
+  agnes: 'agnes_fairwater',
+  finn: 'finn_saltbrook',
+  bob: 'bob_greenfield',
+  katy: 'katy_brewster',
+  gus: 'gus_ironhand',
+  mira: 'mira_coastwatcher',
+  pip: 'pip_quickfoot',
+  bruno: 'bruno_hearthstone',
+  luna: 'luna_tidecaller',
+  cedar: 'cedar_mossgrove',
+};
