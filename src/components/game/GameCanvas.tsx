@@ -57,13 +57,19 @@ export default function GameCanvas({ agents, conversations, onAgentClick }: Game
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Store latest data on __molt so the scene can read it after create()
+  // This fixes the race condition where agents arrive before scene is ready
   useEffect(() => {
-    if (globalThis.__molt?.updateAgents) {
+    globalThis.__molt = globalThis.__molt || {};
+    globalThis.__molt.latestAgents = agents;
+    if (globalThis.__molt.updateAgents) {
       globalThis.__molt.updateAgents(agents);
     }
   }, [agents]);
 
   useEffect(() => {
+    globalThis.__molt = globalThis.__molt || {};
+    globalThis.__molt.latestConversations = conversations;
     if (globalThis.__molt?.showConversations && conversations.length > 0) {
       globalThis.__molt.showConversations(conversations);
     }

@@ -13,6 +13,8 @@ declare global {
     onAgentClick?: (agentId: string) => void;
     updateAgents?: (agents: Agent[]) => void;
     showConversations?: (conversations: Conversation[]) => void;
+    latestAgents?: Agent[];
+    latestConversations?: Conversation[];
   };
 }
 
@@ -92,6 +94,15 @@ export default class IslandScene extends Phaser.Scene {
     globalThis.__molt.showConversations = (convos: Conversation[]) => this.showConversations(convos);
 
     this.tileMap = this.generateIslandMap();
+
+    // Pick up any agent/conversation data that arrived before the scene was ready
+    if (globalThis.__molt.latestAgents && globalThis.__molt.latestAgents.length > 0) {
+      this.time.delayedCall(100, () => {
+        if (globalThis.__molt.latestAgents) {
+          this.updateAgents(globalThis.__molt.latestAgents);
+        }
+      });
+    }
 
     this.cameras.main.setBounds(0, 0, MAP_W, MAP_H);
     this.cameras.main.setZoom(1);

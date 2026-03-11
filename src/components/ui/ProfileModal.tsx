@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import type { Agent, AgentMemory, AgentRelationship, MoltbookPost } from '@/types';
-import { AGENT_SPRITE_MAP } from '@/lib/config';
+import SpriteAvatar from './SpriteAvatar';
 
 interface Detail {
   agent: Agent;
@@ -54,7 +54,6 @@ export default function ProfileModal({ agentId, agents, onClose }: Props) {
 
   const { agent, memories, relationships, posts } = detail;
   const names = Object.fromEntries(agents.map(a => [a.id, a.name]));
-  const spriteSheet = AGENT_SPRITE_MAP[agent.sprite_key] || 'Farmer_Bob';
 
   return (
     <div className="fixed inset-0 bg-black/60 z-[100] flex items-center justify-center p-4" onClick={onClose}>
@@ -69,14 +68,7 @@ export default function ProfileModal({ agentId, agents, onClose }: Props) {
           </button>
           <div className="flex items-start gap-4">
             {/* Sprite avatar frame */}
-            <div className="w-16 h-16 rounded bg-[#2a2015] border-2 border-[#6b4226] flex items-center justify-center overflow-hidden shrink-0">
-              <img
-                src={`/sprites/npcs/${spriteSheet}.png`}
-                alt={agent.name}
-                className="w-12 h-12 object-cover object-left-top"
-                style={{ imageRendering: 'pixelated' }}
-              />
-            </div>
+            <SpriteAvatar spriteKey={agent.sprite_key} size={56} className="border-2 border-[#6b4226]" />
             <div className="min-w-0">
               <h3 className="pixel-font text-[12px] text-[#f5e6c8] leading-tight">{agent.name}</h3>
               <div className="flex items-center gap-2 mt-1">

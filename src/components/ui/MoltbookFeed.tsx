@@ -1,7 +1,7 @@
 'use client';
 
 import type { MoltbookPost } from '@/types';
-import { AGENT_SPRITE_MAP } from '@/lib/config';
+import SpriteAvatar from './SpriteAvatar';
 
 interface Props {
   posts: MoltbookPost[];
@@ -30,7 +30,6 @@ export default function MoltbookFeed({ posts, onAgentClick }: Props) {
   return (
     <div className="space-y-2">
       {posts.map((post, i) => {
-        const spriteSheet = post.author_sprite_key ? (AGENT_SPRITE_MAP[post.author_sprite_key] || 'Farmer_Bob') : null;
         return (
           <div
             key={post.id}
@@ -40,21 +39,15 @@ export default function MoltbookFeed({ posts, onAgentClick }: Props) {
             style={{ animationDelay: `${i * 25}ms` }}
           >
             <div className="flex items-center gap-2 mb-1.5">
-              {/* Sprite avatar or initial */}
-              <div className="w-6 h-6 rounded bg-[#251c0e] border border-[#5a4a30] flex items-center justify-center overflow-hidden shrink-0">
-                {spriteSheet ? (
-                  <img
-                    src={`/sprites/npcs/${spriteSheet}.png`}
-                    alt=""
-                    className="w-5 h-5 object-cover object-left-top"
-                    style={{ imageRendering: 'pixelated' }}
-                  />
-                ) : (
+              {post.author_sprite_key ? (
+                <SpriteAvatar spriteKey={post.author_sprite_key} size={24} />
+              ) : (
+                <div className="w-6 h-6 rounded bg-[#251c0e] border border-[#5a4a30] flex items-center justify-center shrink-0">
                   <span className="text-[9px] font-bold text-[#c4a46c]">
                     {(post.author_name || '?')[0]}
                   </span>
-                )}
-              </div>
+                </div>
+              )}
               <div className="min-w-0 flex-1">
                 <button
                   onClick={() => onAgentClick(post.author_id)}

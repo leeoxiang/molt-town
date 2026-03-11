@@ -33,20 +33,28 @@ export function useRealtimeData(): RealtimeData & {
   const channelRef = useRef<any>(null);
 
   const fetchAll = useCallback(async () => {
-    try {
-      const [a, p, e, c, rw] = await Promise.all([
-        fetch('/api/agents').then(r => r.ok ? r.json() : []),
-        fetch('/api/moltbook?limit=30').then(r => r.ok ? r.json() : []),
-        fetch('/api/events?limit=30').then(r => r.ok ? r.json() : []),
-        fetch('/api/conversations?limit=5').then(r => r.ok ? r.json() : []),
-        fetch('/api/rewards?limit=20').then(r => r.ok ? r.json() : []),
-      ]);
-      if (a) setAgents(a);
-      if (p) setPosts(p);
-      if (e) setEvents(e);
-      if (c) setConversations(c);
-      if (rw) setRewards(rw);
-    } catch { /* ignore */ }
+    // Each fetch is individually guarded — one failing API won't break the others
+    const safeFetch = async (url: string) => {
+      try {
+        const r = await fetch(url);
+        if (!r.ok) return [];
+        const data = await r.json();
+        return Array.isArray(data) ? data : [];
+      } catch { return []; }
+    };
+
+    const [a, p, e, c, rw] = await Promise.all([
+      safeFetch('/api/agents'),
+      safeFetch('/api/moltbook?limit=30'),
+      safeFetch('/api/events?limit=30'),
+      safeFetch('/api/conversations?limit=5'),
+      safeFetch('/api/rewards?limit=20'),
+    ]);
+    setAgents(a);
+    setPosts(p);
+    setEvents(e);
+    setConversations(c);
+    setRewards(rw);
   }, []);
 
   // Initial fetch
@@ -66,18 +74,26 @@ export function useRealtimeData(): RealtimeData & {
         const client = createClient(url, key);
         const channel = client.channel('molt-town-live');
 
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const safeRefetch = (url: string, setter: (d: any[]) => void) => {
+          if (!mounted) return;
+          fetch(url).then(r => r.ok ? r.json() : []).then(d => {
+            if (mounted && Array.isArray(d)) setter(d);
+          }).catch(() => {});
+        };
+
         channel
           .on('postgres_changes', { event: '*', schema: 'public', table: 'agents' }, () => {
-            if (mounted) fetch('/api/agents').then(r => r.json()).then(setAgents).catch(() => {});
+            safeRefetch('/api/agents', setAgents);
           })
           .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'moltbook_posts' }, () => {
-            if (mounted) fetch('/api/moltbook?limit=30').then(r => r.json()).then(setPosts).catch(() => {});
+            safeRefetch('/api/moltbook?limit=30', setPosts);
           })
           .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'world_events' }, () => {
-            if (mounted) fetch('/api/events?limit=30').then(r => r.json()).then(setEvents).catch(() => {});
+            safeRefetch('/api/events?limit=30', setEvents);
           })
           .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'conversations' }, () => {
-            if (mounted) fetch('/api/conversations?limit=5').then(r => r.json()).then(setConversations).catch(() => {});
+            safeRefetch('/api/conversations?limit=5', setConversations);
           })
           .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'simulation_ticks' }, (payload) => {
             if (mounted && payload.new) {
