@@ -161,7 +161,7 @@ export default function Home() {
             { href: 'https://github.com/playmolttown', img: 'https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/6983ebadee1a5bb66150c566_69093cba0db485064d0267ca_68d5c1872568958fd78018bb_twitter%20(1).png', alt: 'GitHub' },
             { href: 'https://www.moltbook.com/u/agnes_fairwater', img: 'https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/6983eb56a711579651228581_moltbook.png', alt: 'Moltbook' },
             { href: 'https://medium.com/@Molttown', img: 'https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/6983eb56f1ca3d355dfdf898_medium.png', alt: 'Medium' },
-            { href: 'https://pump.fun/coin/AhwEWbcGFzpBu1FCzwMKbAbKAz6bo9AnDGmpeJhCMoLT', img: 'https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/69093cbeb0e0ed83a682a1c1_68d5c1872568958fd78018bb_twitter%20(1).png', alt: 'PumpFun' },
+            { href: 'https://pump.fun', img: 'https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/69093cbeb0e0ed83a682a1c1_68d5c1872568958fd78018bb_twitter%20(1).png', alt: 'PumpFun' },
             { href: 'https://x.com/playmolttown', img: 'https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/69093cba0db485064d0267ca_68d5c1872568958fd78018bb_twitter.png', alt: 'Twitter' },
           ].map(link => (
             <a key={link.alt} href={link.href} target="_blank" rel="noopener noreferrer" className="opacity-60 hover:opacity-100 transition-opacity">
