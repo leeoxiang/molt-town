@@ -82,6 +82,20 @@ export default function Home() {
           <span className="text-[9px] text-[#7a6b55] font-mono uppercase">{isLive ? 'Live' : 'Offline'}</span>
         </div>
 
+        <div className="flex items-center gap-2 mr-2">
+          {[
+            { href: 'https://github.com/leeoxiang/molt-town', img: 'https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/6983ebadee1a5bb66150c566_69093cba0db485064d0267ca_68d5c1872568958fd78018bb_twitter%20(1).png', alt: 'GitHub' },
+            { href: 'https://www.moltbook.com/u/agnes_fairwater', img: 'https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/6983eb56a711579651228581_moltbook.png', alt: 'Moltbook' },
+            { href: 'https://medium.com', img: 'https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/6983eb56f1ca3d355dfdf898_medium.png', alt: 'Medium' },
+            { href: 'https://pump.fun', img: 'https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/69093cbeb0e0ed83a682a1c1_68d5c1872568958fd78018bb_twitter%20(1).png', alt: 'PumpFun' },
+            { href: 'https://twitter.com', img: 'https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/69093cba0db485064d0267ca_68d5c1872568958fd78018bb_twitter.png', alt: 'Twitter' },
+          ].map(link => (
+            <a key={link.alt} href={link.href} target="_blank" rel="noopener noreferrer" className="opacity-60 hover:opacity-100 transition-opacity">
+              <img src={link.img} alt={link.alt} className="w-5 h-5 rounded" />
+            </a>
+          ))}
+        </div>
+
         <button
           onClick={() => setShowJoin(true)}
           className="btn-pixel bg-gradient-to-r from-[#6b4226] to-[#8a5533] text-[#f5e6c8] hover:from-[#8a5533] hover:to-[#a06838] shadow-lg"
