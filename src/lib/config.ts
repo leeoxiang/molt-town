@@ -63,6 +63,13 @@ export const LOCATION_BUILDINGS: Record<string, { key: string; scale: number; of
   lighthouse: { key: 'bld_wood',       scale: 1.2, offsetY: -35 },
 };
 
-export const AGENT_SPEED = 1.8;
+export const AGENT_SPEED = 0.55;
+
+// Idle/wander behavior
+export const IDLE_MIN_MS = 3000;   // min idle pause at destination
+export const IDLE_MAX_MS = 8000;   // max idle pause
+export const WANDER_RADIUS = 60;   // px radius for local wandering
+export const WANDER_CHANCE = 0.35; // chance to wander after idle pause
+
 export const MEMORY_WINDOW = 50;
 export const HOURS_PER_DAY = 24;

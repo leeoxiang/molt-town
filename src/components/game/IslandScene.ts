@@ -1,8 +1,9 @@
 import * as Phaser from 'phaser';
 import {
-  TILE_SIZE, MAP_COLS, MAP_ROWS, MAP_W, MAP_H, VIEW_W, VIEW_H,
+  TILE_SIZE, MAP_COLS, MAP_ROWS, MAP_W, MAP_H,
   LOCATION_POSITIONS, NPC_SPRITE_CONFIG, NPC_FRAME_SIZE,
   AGENT_SPRITE_MAP, LOCATION_BUILDINGS, AGENT_SPEED,
+  IDLE_MIN_MS, IDLE_MAX_MS, WANDER_RADIUS, WANDER_CHANCE,
 } from '@/lib/config';
 import type { Agent, Conversation, ConversationMessage } from '@/types';
 
@@ -22,6 +23,8 @@ const PATH  = 3;
 const FARM  = 4;
 const DARK_GRASS = 5;
 
+type AgentState = 'walking' | 'idle' | 'wandering' | 'talking';
+
 interface AgentSprite {
   container: Phaser.GameObjects.Container;
   sprite: Phaser.GameObjects.Sprite;
@@ -31,9 +34,13 @@ interface AgentSprite {
   bubbleTimer?: Phaser.Time.TimerEvent;
   targetX: number;
   targetY: number;
+  homeX: number;
+  homeY: number;
   sheetName: string;
-  moving: boolean;
+  state: AgentState;
+  idleUntil: number;
   agentData: Agent;
+  talkingTo?: string;
 }
 
 export default class IslandScene extends Phaser.Scene {
@@ -42,6 +49,7 @@ export default class IslandScene extends Phaser.Scene {
   private isDragging = false;
   private dragStartX = 0;
   private dragStartY = 0;
+  private seenConvoIds: Set<string> = new Set();
 
   constructor() {
     super({ key: 'IslandScene' });
@@ -131,17 +139,37 @@ export default class IslandScene extends Phaser.Scene {
   }
 
   update() {
+    const now = this.time.now;
+
     for (const [, a] of this.agentSprites) {
+      // If talking, stay still and face partner
+      if (a.state === 'talking') {
+        if (a.talkingTo) {
+          const partner = this.agentSprites.get(a.talkingTo);
+          if (partner) {
+            const dx = partner.container.x - a.container.x;
+            if (Math.abs(dx) > 5) {
+              this.playAnim(a, 'idle_side');
+              a.sprite.setFlipX(dx < 0);
+            } else {
+              this.playAnim(a, 'idle_down');
+            }
+          }
+        }
+        a.container.setDepth(100 + a.container.y);
+        continue;
+      }
+
       const dx = a.targetX - a.container.x;
       const dy = a.targetY - a.container.y;
       const dist = Math.sqrt(dx * dx + dy * dy);
 
-      if (dist > 3) {
-        a.moving = true;
-        a.container.x += (dx / dist) * AGENT_SPEED;
-        a.container.y += (dy / dist) * AGENT_SPEED;
+      if (dist > 3 && (a.state === 'walking' || a.state === 'wandering')) {
+        // Move toward target — wandering is slower
+        const speed = a.state === 'wandering' ? AGENT_SPEED * 0.6 : AGENT_SPEED;
+        a.container.x += (dx / dist) * speed;
+        a.container.y += (dy / dist) * speed;
 
-        // Walk anim
         if (Math.abs(dx) > Math.abs(dy)) {
           this.playAnim(a, 'walk_side');
           a.sprite.setFlipX(dx < 0);
@@ -152,10 +180,32 @@ export default class IslandScene extends Phaser.Scene {
           this.playAnim(a, 'walk_up');
           a.sprite.setFlipX(false);
         }
-      } else if (a.moving) {
-        a.moving = false;
-        this.playAnim(a, 'idle_down');
-        a.sprite.setFlipX(false);
+      } else if (a.state === 'walking' || a.state === 'wandering') {
+        // Arrived — start idling
+        a.state = 'idle';
+        a.idleUntil = now + IDLE_MIN_MS + Math.random() * (IDLE_MAX_MS - IDLE_MIN_MS);
+
+        const idleAnims = ['idle_down', 'idle_side', 'idle_up'];
+        const pick = idleAnims[Math.floor(Math.random() * idleAnims.length)];
+        this.playAnim(a, pick);
+        if (pick === 'idle_side') a.sprite.setFlipX(Math.random() < 0.5);
+        else a.sprite.setFlipX(false);
+      } else if (a.state === 'idle' && now > a.idleUntil) {
+        // Idle time expired — maybe wander locally
+        if (Math.random() < WANDER_CHANCE) {
+          const angle = Math.random() * Math.PI * 2;
+          const r = 15 + Math.random() * WANDER_RADIUS;
+          a.targetX = a.homeX + Math.cos(angle) * r;
+          a.targetY = a.homeY + Math.sin(angle) * r * 0.5 + 20;
+          a.state = 'wandering';
+        } else {
+          // Continue idling with a new pause
+          a.idleUntil = now + IDLE_MIN_MS + Math.random() * (IDLE_MAX_MS - IDLE_MIN_MS);
+          const idleAnims = ['idle_down', 'idle_side', 'idle_up'];
+          const pick = idleAnims[Math.floor(Math.random() * idleAnims.length)];
+          this.playAnim(a, pick);
+          if (pick === 'idle_side') a.sprite.setFlipX(Math.random() < 0.5);
+        }
       }
 
       a.container.setDepth(100 + a.container.y);
@@ -199,7 +249,6 @@ export default class IslandScene extends Phaser.Scene {
       }
     }
 
-    // Paths
     const pairs: [string, string][] = [
       ['market', 'tavern'], ['market', 'mayor'], ['market', 'smithy'],
       ['market', 'farm'], ['tavern', 'beach'], ['tavern', 'docks'],
@@ -214,7 +263,6 @@ export default class IslandScene extends Phaser.Scene {
         Math.floor(pb.x / TILE_SIZE), Math.floor(pb.y / TILE_SIZE));
     }
 
-    // Farm plots
     const fp = LOCATION_POSITIONS.farm;
     const fx = Math.floor(fp.x / TILE_SIZE);
     const fy = Math.floor(fp.y / TILE_SIZE);
@@ -255,7 +303,6 @@ export default class IslandScene extends Phaser.Scene {
 
   // ── Tile rendering ──
   private renderTileMap() {
-    // Water background
     const waterBg = this.add.tileSprite(0, 0, MAP_W, MAP_H, 'tile_water');
     waterBg.setOrigin(0, 0).setDepth(0);
     this.tweens.add({
@@ -263,7 +310,6 @@ export default class IslandScene extends Phaser.Scene {
       duration: 8000, yoyo: true, repeat: -1, ease: 'Sine.easeInOut',
     });
 
-    // Land tiles using graphics for performance
     const g = this.add.graphics().setDepth(1);
     const colors: Record<number, number[]> = {
       [GRASS]:      [0x5fa85f, 0x55a055, 0x65ad65],
@@ -285,7 +331,6 @@ export default class IslandScene extends Phaser.Scene {
       }
     }
 
-    // Farm furrows
     const furrows = this.add.graphics().setDepth(2).setAlpha(0.4);
     for (let row = 0; row < MAP_ROWS; row++) {
       for (let col = 0; col < MAP_COLS; col++) {
@@ -297,7 +342,6 @@ export default class IslandScene extends Phaser.Scene {
       }
     }
 
-    // Beach shimmer (edge of water)
     const shimmer = this.add.graphics().setDepth(2).setAlpha(0.18);
     for (let row = 1; row < MAP_ROWS - 1; row++) {
       for (let col = 1; col < MAP_COLS - 1; col++) {
@@ -312,7 +356,6 @@ export default class IslandScene extends Phaser.Scene {
       }
     }
 
-    // Sparse water wave highlights
     const waves = this.add.graphics().setDepth(2).setAlpha(0.25);
     const rng = this.seeded(77);
     for (let i = 0; i < 2000; i++) {
@@ -341,7 +384,6 @@ export default class IslandScene extends Phaser.Scene {
       img.setDepth(50 + pos.y);
     }
 
-    // Extra barn
     const farm = LOCATION_POSITIONS.farm;
     if (this.textures.exists('bld_barn')) {
       this.add.image(farm.x - 130, farm.y + 30, 'bld_barn').setScale(0.9).setDepth(50 + farm.y);
@@ -390,7 +432,6 @@ export default class IslandScene extends Phaser.Scene {
       if (this.anims.exists('fountain_bubble')) f.play('fountain_bubble');
     }
 
-    // Grass tufts
     const rng = this.seeded(123);
     const tufts = this.add.graphics().setDepth(3);
     for (let i = 0; i < 1200; i++) {
@@ -460,8 +501,19 @@ export default class IslandScene extends Phaser.Scene {
 
       if (this.agentSprites.has(agent.id)) {
         const e = this.agentSprites.get(agent.id)!;
-        e.targetX = pos.x + off.x;
-        e.targetY = pos.y + off.y;
+        const newHomeX = pos.x + off.x;
+        const newHomeY = pos.y + off.y;
+
+        // Only set new walking target if location actually changed
+        const locationChanged = e.agentData.current_location_id !== agent.current_location_id;
+        if (locationChanged) {
+          e.homeX = newHomeX;
+          e.homeY = newHomeY;
+          e.targetX = newHomeX;
+          e.targetY = newHomeY;
+          e.state = 'walking';
+          e.talkingTo = undefined;
+        }
         e.agentData = agent;
       } else {
         this.createAgent(agent, pos.x + off.x, pos.y + off.y);
@@ -485,7 +537,6 @@ export default class IslandScene extends Phaser.Scene {
     let sprite: Phaser.GameObjects.Sprite;
     if (this.textures.exists(sheetName)) {
       sprite = this.add.sprite(0, 0, sheetName, 0);
-      // Scale up smaller sprites (48px) to match standard 64px size
       const cfg = NPC_SPRITE_CONFIG[sheetName];
       if (cfg?.frameSize && cfg.frameSize < NPC_FRAME_SIZE) {
         sprite.setScale(NPC_FRAME_SIZE / cfg.frameSize);
@@ -523,7 +574,11 @@ export default class IslandScene extends Phaser.Scene {
     this.agentSprites.set(agent.id, {
       container, sprite, nameTag, shadow,
       targetX: x, targetY: y,
-      sheetName, moving: false, agentData: agent,
+      homeX: x, homeY: y,
+      sheetName,
+      state: 'idle',
+      idleUntil: this.time.now + IDLE_MIN_MS + Math.random() * IDLE_MAX_MS,
+      agentData: agent,
     });
   }
 
@@ -533,7 +588,6 @@ export default class IslandScene extends Phaser.Scene {
     const count = atSame.length;
     if (count <= 1) return { x: 0, y: 25 };
 
-    // Grid-like arrangement for cleaner spacing
     if (count <= 4) {
       const positions = [
         { x: -30, y: 15 }, { x: 30, y: 15 },
@@ -542,23 +596,48 @@ export default class IslandScene extends Phaser.Scene {
       return positions[idx] || { x: 0, y: 25 };
     }
 
-    // Circle for larger groups, with more radius
     const angle = (idx / count) * Math.PI * 2 + 0.3;
     const r = 40 + count * 8;
     return { x: Math.cos(angle) * r, y: Math.sin(angle) * r * 0.5 + 25 };
   }
 
-  // ── Speech bubbles ──
+  // ── Speech bubbles (parchment style) ──
   showConversations(conversations: Conversation[]) {
     for (const convo of conversations) {
+      if (this.seenConvoIds.has(convo.id)) continue;
+      this.seenConvoIds.add(convo.id);
+
       const messages = convo.messages as ConversationMessage[];
       if (!messages || messages.length === 0) continue;
 
-      // Sequence speech bubbles with delays
+      // Make participants face each other and stop
+      const participantIds = messages.map(m => m.agent_id).filter((v, i, a) => a.indexOf(v) === i);
+      for (const pid of participantIds) {
+        const as = this.agentSprites.get(pid);
+        if (as) {
+          as.state = 'talking';
+          as.talkingTo = participantIds.find(id => id !== pid) || undefined;
+        }
+      }
+
+      // Sequence speech bubbles with natural timing
       messages.forEach((msg, i) => {
-        this.time.delayedCall(i * 2500, () => {
+        this.time.delayedCall(i * 3500, () => {
           this.showBubble(msg.agent_id, msg.content);
         });
+      });
+
+      // Release agents after all messages
+      const totalDuration = messages.length * 3500 + 3000;
+      this.time.delayedCall(totalDuration, () => {
+        for (const pid of participantIds) {
+          const as = this.agentSprites.get(pid);
+          if (as && as.state === 'talking') {
+            as.state = 'idle';
+            as.idleUntil = this.time.now + IDLE_MIN_MS;
+            as.talkingTo = undefined;
+          }
+        }
       });
     }
   }
@@ -567,7 +646,6 @@ export default class IslandScene extends Phaser.Scene {
     const agentSprite = this.agentSprites.get(agentId);
     if (!agentSprite) return;
 
-    // Remove existing bubble
     if (agentSprite.bubble) {
       agentSprite.bubble.destroy();
       agentSprite.bubble = undefined;
@@ -577,55 +655,67 @@ export default class IslandScene extends Phaser.Scene {
       agentSprite.bubbleTimer = undefined;
     }
 
-    // Truncate long text
-    const display = text.length > 50 ? text.substring(0, 47) + '...' : text;
+    const display = text.length > 60 ? text.substring(0, 57) + '...' : text;
 
-    const bubbleText = this.add.text(0, -70, display, {
+    // Parchment-style bubble
+    const bubbleText = this.add.text(0, 0, display, {
       fontSize: '9px',
-      fontFamily: 'monospace',
-      color: '#1e293b',
-      wordWrap: { width: 140 },
+      fontFamily: '"Press Start 2P", monospace',
+      color: '#3a2510',
+      wordWrap: { width: 150 },
       align: 'center',
+      lineSpacing: 4,
     }).setOrigin(0.5, 1);
 
-    const pad = 8;
-    const w = Math.max(bubbleText.width + pad * 2, 40);
+    const pad = 10;
+    const w = Math.max(bubbleText.width + pad * 2, 50);
     const h = bubbleText.height + pad * 2;
+    const bubbleY = -65;
 
     const bg = this.add.graphics();
-    // Bubble background
-    bg.fillStyle(0xffffff, 0.95);
-    bg.fillRoundedRect(-w / 2, -70 - h + bubbleText.height, w, h, 6);
-    bg.lineStyle(1, 0x94a3b8, 0.6);
-    bg.strokeRoundedRect(-w / 2, -70 - h + bubbleText.height, w, h, 6);
-    // Tail triangle
-    bg.fillStyle(0xffffff, 0.95);
-    bg.fillTriangle(-4, -70 + bubbleText.height, 4, -70 + bubbleText.height, 0, -60 + bubbleText.height);
+    bg.fillStyle(0xf5e6c8, 0.95);
+    bg.fillRoundedRect(-w / 2, bubbleY - h, w, h, 4);
+    bg.lineStyle(2, 0x6b4226, 0.9);
+    bg.strokeRoundedRect(-w / 2, bubbleY - h, w, h, 4);
+    bg.lineStyle(1, 0xdec9a0, 0.4);
+    bg.strokeRoundedRect(-w / 2 + 2, bubbleY - h + 2, w - 4, h - 4, 3);
+    bg.fillStyle(0xf5e6c8, 0.95);
+    bg.fillTriangle(-5, bubbleY, 5, bubbleY, 0, bubbleY + 8);
+    bg.lineStyle(2, 0x6b4226, 0.9);
+    bg.lineBetween(-5, bubbleY, 0, bubbleY + 8);
+    bg.lineBetween(5, bubbleY, 0, bubbleY + 8);
+
+    bubbleText.setPosition(0, bubbleY - pad);
 
     const bubble = this.add.container(0, 0);
     bubble.add(bg);
     bubble.add(bubbleText);
     bubble.setDepth(500);
     bubble.setAlpha(0);
+    bubble.setScale(0.8);
 
     agentSprite.container.add(bubble);
     agentSprite.bubble = bubble;
 
-    // Fade in
+    // Pop-in animation
     this.tweens.add({
       targets: bubble,
       alpha: 1,
-      duration: 200,
-      ease: 'Power2',
+      scaleX: 1,
+      scaleY: 1,
+      duration: 250,
+      ease: 'Back.easeOut',
     });
 
-    // Auto-remove after 2.2s
-    agentSprite.bubbleTimer = this.time.delayedCall(2200, () => {
+    // Auto-remove after 3s
+    agentSprite.bubbleTimer = this.time.delayedCall(3000, () => {
       if (agentSprite.bubble === bubble) {
         this.tweens.add({
           targets: bubble,
           alpha: 0,
+          scaleY: 0.7,
           duration: 300,
+          ease: 'Power2',
           onComplete: () => {
             bubble.destroy();
             if (agentSprite.bubble === bubble) {

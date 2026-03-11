@@ -1,22 +1,21 @@
-@import "tailwindcss";
-
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import "tailwindcss";
 
 :root {
-  --bg-primary: #080c16;
-  --bg-secondary: #0d1220;
-  --bg-card: #111827;
-  --bg-card-hover: #1a2236;
-  --border: #1e2d4a;
-  --border-accent: #3b82f6;
-  --text-primary: #e2e8f0;
-  --text-secondary: #94a3b8;
-  --text-muted: #475569;
-  --accent: #3b82f6;
-  --accent-glow: rgba(59, 130, 246, 0.12);
-  --gold: #f59e0b;
-  --gold-glow: rgba(245, 158, 11, 0.15);
+  --bg-primary: #0e0a04;
+  --bg-secondary: #1a1408;
+  --bg-card: #201810;
+  --bg-card-hover: #251c0e;
+  --border: #3a2f1a;
+  --border-accent: #6b4226;
+  --text-primary: #e8d5b0;
+  --text-secondary: #a89070;
+  --text-muted: #5a4a30;
+  --accent: #c4a46c;
+  --accent-glow: rgba(196, 164, 108, 0.12);
+  --gold: #f5c842;
+  --gold-glow: rgba(245, 200, 66, 0.15);
 }
 
 body {
@@ -37,12 +36,11 @@ canvas {
 
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: #1e2d4a; border-radius: 10px; }
-::-webkit-scrollbar-thumb:hover { background: #2d3f5e; }
+::-webkit-scrollbar-thumb { background: #3a2f1a; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #5a4a30; }
 
-.glow-blue { box-shadow: 0 0 15px rgba(59, 130, 246, 0.08), inset 0 1px 0 rgba(59, 130, 246, 0.08); }
-.glow-text { text-shadow: 0 0 8px rgba(59, 130, 246, 0.3); }
-.glow-gold { text-shadow: 0 0 8px rgba(245, 158, 11, 0.4); }
+.glow-gold { text-shadow: 0 0 8px rgba(245, 200, 66, 0.4); }
+.glow-text { text-shadow: 0 0 8px rgba(196, 164, 108, 0.3); }
 
 @keyframes fadeSlideIn {
   from { opacity: 0; transform: translateY(-6px); }
@@ -55,7 +53,7 @@ canvas {
   100% { background-position: 200% 0; }
 }
 
-/* Panel styling */
+/* Panel styling — parchment/wood */
 .panel {
   background: var(--bg-secondary);
   border: 1px solid var(--border);
@@ -75,7 +73,7 @@ canvas {
   overflow-y: auto;
 }
 
-/* Pixel button style */
+/* Pixel button style — wooden/medieval */
 .btn-pixel {
   position: relative;
   padding: 6px 14px;
@@ -85,6 +83,7 @@ canvas {
   transition: all 0.15s;
   text-transform: uppercase;
   letter-spacing: 0.5px;
+  border: 1px solid rgba(107, 66, 38, 0.5);
 }
 
 .btn-pixel:active { transform: translateY(1px); }
