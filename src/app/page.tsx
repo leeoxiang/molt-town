@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import { useRealtimeData } from '@/lib/useRealtimeData';
 import MoltbookFeed from '@/components/ui/MoltbookFeed';
@@ -10,6 +10,7 @@ import ProfileModal from '@/components/ui/ProfileModal';
 import JoinModal from '@/components/ui/JoinModal';
 import AboutModal from '@/components/ui/AboutModal';
 import MusicPlayer from '@/components/ui/MusicPlayer';
+import WirepaperModal from '@/components/ui/WirepaperModal';
 
 const GameCanvas = dynamic(() => import('@/components/game/GameCanvas'), {
   ssr: false,
@@ -34,7 +35,16 @@ export default function Home() {
   const [showProfile, setShowProfile] = useState(false);
   const [showJoin, setShowJoin] = useState(false);
   const [showAbout, setShowAbout] = useState(false);
+  const [showWirepaper, setShowWirepaper] = useState(false);
   const [myWallet, setMyWallet] = useState<string | null>(null);
+
+  // Show wirepaper on first visit
+  useEffect(() => {
+    if (!localStorage.getItem('molt_seen_wirepaper')) {
+      setShowWirepaper(true);
+      localStorage.setItem('molt_seen_wirepaper', '1');
+    }
+  }, []);
 
   const handleAgentClick = useCallback((id: string) => {
     setSelectedId(id);
@@ -131,6 +141,13 @@ export default function Home() {
         </div>
 
         <MusicPlayer />
+
+        <button
+          onClick={() => setShowWirepaper(true)}
+          className="text-[9px] text-[#c4a46c] hover:text-[#f5e6c8] transition font-semibold px-2 py-1 rounded hover:bg-[#1a1408] border border-[#3a2f1a] hover:border-[#5a4a30]"
+        >
+          Wirepaper
+        </button>
 
         <button
           onClick={() => setShowAbout(true)}
@@ -300,6 +317,11 @@ export default function Home() {
       {/* About Modal */}
       {showAbout && (
         <AboutModal onClose={() => setShowAbout(false)} />
+      )}
+
+      {/* Wirepaper Modal */}
+      {showWirepaper && (
+        <WirepaperModal onClose={() => setShowWirepaper(false)} />
       )}
     </div>
   );
