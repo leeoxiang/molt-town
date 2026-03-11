@@ -74,6 +74,10 @@ export default function AgentInspector({ agentId, agents, onClose }: Props) {
             </span>
             <span className="text-[10px] text-slate-500">@ {agent.current_location_id}</span>
           </div>
+          <div className="flex items-center gap-1 mt-1">
+            <span className="text-amber-400 font-bold text-xs glow-gold">{(agent.molt_balance || 0).toFixed(0)}</span>
+            <span className="text-amber-600 text-[9px] font-semibold">MOLT</span>
+          </div>
         </div>
         <button onClick={onClose} className="text-slate-600 hover:text-white text-sm px-2 py-1 rounded hover:bg-slate-800 transition">
           x

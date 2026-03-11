@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
-import { VIEW_W, VIEW_H } from '@/lib/config';
 import type { Agent, Conversation } from '@/types';
 
 interface GameCanvasProps {
@@ -25,13 +24,18 @@ export default function GameCanvas({ agents, conversations, onAgentClick }: Game
       const Phaser = PhaserModule.default || PhaserModule;
       const { default: IslandScene } = await import('./IslandScene');
 
+      // Use parent container size for the game canvas
+      const rect = containerRef.current.getBoundingClientRect();
+      const w = Math.floor(rect.width) || 960;
+      const h = Math.floor(rect.height) || 640;
+
       const game = new Phaser.Game({
         type: Phaser.AUTO,
         parent: containerRef.current,
-        width: VIEW_W,
-        height: VIEW_H,
+        width: w,
+        height: h,
         pixelArt: true,
-        backgroundColor: '#1a3a5c',
+        backgroundColor: '#0a1628',
         scene: [IslandScene],
         scale: {
           mode: Phaser.Scale.NONE,
@@ -68,8 +72,7 @@ export default function GameCanvas({ agents, conversations, onAgentClick }: Game
   return (
     <div
       ref={containerRef}
-      className="mx-auto rounded-xl overflow-hidden border-2 border-slate-700/80 shadow-2xl shadow-black/40"
-      style={{ width: VIEW_W, height: VIEW_H, maxWidth: '100%' }}
+      className="w-full h-full overflow-hidden"
     />
   );
 }

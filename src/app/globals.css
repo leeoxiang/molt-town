@@ -1,25 +1,29 @@
 @import "tailwindcss";
 
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
-  --bg-primary: #0a0e1a;
-  --bg-secondary: #0f1629;
-  --bg-card: #141b2d;
-  --bg-card-hover: #1a2340;
+  --bg-primary: #080c16;
+  --bg-secondary: #0d1220;
+  --bg-card: #111827;
+  --bg-card-hover: #1a2236;
   --border: #1e2d4a;
-  --border-accent: #2563eb;
+  --border-accent: #3b82f6;
   --text-primary: #e2e8f0;
   --text-secondary: #94a3b8;
   --text-muted: #475569;
   --accent: #3b82f6;
-  --accent-glow: rgba(59, 130, 246, 0.15);
+  --accent-glow: rgba(59, 130, 246, 0.12);
+  --gold: #f59e0b;
+  --gold-glow: rgba(245, 158, 11, 0.15);
 }
 
 body {
   background: var(--bg-primary);
   color: var(--text-primary);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow: hidden;
 }
 
 .pixel-font {
@@ -31,28 +35,65 @@ canvas {
   image-rendering: crisp-edges;
 }
 
-::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #1e2d4a; border-radius: 10px; }
 ::-webkit-scrollbar-thumb:hover { background: #2d3f5e; }
 
-/* Glow effects */
-.glow-blue { box-shadow: 0 0 20px rgba(59, 130, 246, 0.1), inset 0 1px 0 rgba(59, 130, 246, 0.1); }
-.glow-text { text-shadow: 0 0 10px rgba(59, 130, 246, 0.3); }
+.glow-blue { box-shadow: 0 0 15px rgba(59, 130, 246, 0.08), inset 0 1px 0 rgba(59, 130, 246, 0.08); }
+.glow-text { text-shadow: 0 0 8px rgba(59, 130, 246, 0.3); }
+.glow-gold { text-shadow: 0 0 8px rgba(245, 158, 11, 0.4); }
 
-/* Moltbook post animation */
 @keyframes fadeSlideIn {
-  from { opacity: 0; transform: translateY(-8px); }
+  from { opacity: 0; transform: translateY(-6px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.animate-post { animation: fadeSlideIn 0.3s ease-out; }
+.animate-post { animation: fadeSlideIn 0.25s ease-out; }
 
-/* Meter bar shimmer */
 @keyframes shimmer {
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
-.meter-bar {
-  background-size: 200% 100%;
-  animation: shimmer 3s ease-in-out infinite;
+
+/* Panel styling */
+.panel {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.panel-header {
+  border-bottom: 1px solid var(--border);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.panel-body {
+  padding: 8px;
+  overflow-y: auto;
+}
+
+/* Pixel button style */
+.btn-pixel {
+  position: relative;
+  padding: 6px 14px;
+  font-size: 10px;
+  font-weight: 700;
+  border-radius: 4px;
+  transition: all 0.15s;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-pixel:active { transform: translateY(1px); }
+
+/* Tag style */
+.tag {
+  font-size: 9px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
 }

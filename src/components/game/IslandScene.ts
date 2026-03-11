@@ -530,10 +530,22 @@ export default class IslandScene extends Phaser.Scene {
   private getOffset(id: string, agents: Agent[], locId: string) {
     const atSame = agents.filter(a => a.current_location_id === locId);
     const idx = atSame.findIndex(a => a.id === id);
-    if (atSame.length <= 1) return { x: 0, y: 25 };
-    const angle = (idx / atSame.length) * Math.PI * 2;
-    const r = 35 + atSame.length * 6;
-    return { x: Math.cos(angle) * r, y: Math.sin(angle) * r * 0.6 + 25 };
+    const count = atSame.length;
+    if (count <= 1) return { x: 0, y: 25 };
+
+    // Grid-like arrangement for cleaner spacing
+    if (count <= 4) {
+      const positions = [
+        { x: -30, y: 15 }, { x: 30, y: 15 },
+        { x: -30, y: 50 }, { x: 30, y: 50 },
+      ];
+      return positions[idx] || { x: 0, y: 25 };
+    }
+
+    // Circle for larger groups, with more radius
+    const angle = (idx / count) * Math.PI * 2 + 0.3;
+    const r = 40 + count * 8;
+    return { x: Math.cos(angle) * r, y: Math.sin(angle) * r * 0.5 + 25 };
   }
 
   // ── Speech bubbles ──

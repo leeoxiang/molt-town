@@ -28,6 +28,7 @@ export interface Agent {
   reputation: number;
   current_thought: string;
   moltbook_persona: string;
+  molt_balance: number;
   created_at: string;
 }
 
@@ -109,6 +110,16 @@ export interface Conversation {
   location_id: string;
   participants: string[];
   messages: ConversationMessage[];
+  created_at: string;
+}
+
+// ── Rewards ──
+export interface RewardEvent {
+  id: string;
+  agent_id: string;
+  tick_id: number;
+  amount: number;
+  reason: string;
   created_at: string;
 }
 
