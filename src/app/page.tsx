@@ -94,18 +94,32 @@ export default function Home() {
 
         <div className="h-4 w-px bg-[#3a2f1a]" />
 
-        <div className="flex items-center gap-3 text-[10px]">
-          <div className="flex items-center gap-1.5">
-            <span className="pixel-font text-[9px] text-[#f5c842] font-bold glow-gold">{totalMolt.toFixed(0)}</span>
-            <span className="text-[#a08050] font-bold">MOLTTOWN</span>
-          </div>
-          <div className="h-3 w-px bg-[#3a2f1a]" />
-          <div className="flex items-center gap-2.5 text-[9px] font-mono">
-            <span className="text-[#5a4a30]">Block <span className="text-[#8a7b65]">{blockHeight}</span></span>
-            <span className="text-[#5a4a30]">Epoch <span className="text-[#8a7b65]">{epoch}</span></span>
-            <span className="text-[#5a4a30]">Workers <span className="text-[#8a7b65]">{activeWorkers}<span className="text-[#3a2f1a]">/{totalWorkers}</span></span></span>
-            <span className="text-[#5a4a30]">Reward <span className="text-[#c4a46c]">{avgReward.toFixed(1)}</span></span>
-            <span className="text-[#5a4a30]">H/s <span className="text-emerald-600">{hashrate}</span></span>
+        <div className="flex items-center gap-2 text-[10px] bg-[#0e0a04]/60 rounded px-2 py-1 border border-[#2a2010]">
+          <span className="pixel-font text-[10px] text-[#f5c842] font-bold glow-gold">{totalMolt.toFixed(0)}</span>
+          <span className="text-[#a08050] font-bold">MOLTTOWN</span>
+          <span className="text-[#5a4a30] text-[9px]">mined</span>
+          <div className="h-3 w-px bg-[#3a2f1a] mx-0.5" />
+          <div className="flex items-center gap-2 text-[8px] font-mono tracking-tight">
+            <div className="flex flex-col items-center leading-none">
+              <span className="text-[#8a7b65] font-semibold">{blockHeight}</span>
+              <span className="text-[#3a2f1a] text-[7px] uppercase">Block</span>
+            </div>
+            <div className="flex flex-col items-center leading-none">
+              <span className="text-[#8a7b65] font-semibold">{epoch}</span>
+              <span className="text-[#3a2f1a] text-[7px] uppercase">Epoch</span>
+            </div>
+            <div className="flex flex-col items-center leading-none">
+              <span className="text-[#8a7b65] font-semibold">{activeWorkers}<span className="text-[#3a2f1a]">/{totalWorkers}</span></span>
+              <span className="text-[#3a2f1a] text-[7px] uppercase">Workers</span>
+            </div>
+            <div className="flex flex-col items-center leading-none">
+              <span className="text-[#c4a46c] font-semibold">{avgReward.toFixed(1)}</span>
+              <span className="text-[#3a2f1a] text-[7px] uppercase">Reward</span>
+            </div>
+            <div className="flex flex-col items-center leading-none">
+              <span className="text-emerald-500 font-semibold">{hashrate}</span>
+              <span className="text-[#3a2f1a] text-[7px] uppercase">H/s</span>
+            </div>
           </div>
         </div>
 
