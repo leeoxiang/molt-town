@@ -5,7 +5,7 @@ import type { Agent, ScheduleEntry, AgentRelationship, MoltbookPost } from '@/ty
 
 const db = () => getServiceSupabase();
 
-// Reward amounts (simulated MOLTTOWN credits)
+// Reward amounts (simulated GOLD credits)
 const REWARDS = {
   work: 5,
   interaction: 3,
@@ -350,7 +350,7 @@ function generateConversationTemplate(
       [`The market feels busier than usual.`, `Word is a shipment came in at the docks.`],
       [`I need to pick up some supplies.`, `Check Luna's stall — she had a good haul yesterday.`],
       [`Have you noticed the new vendor?`, `Which one? The one with the strange herbs?`],
-      [`MOLTTOWN prices are going up.`, `Everyone's been mining hard this week.`],
+      [`GOLD prices are going up.`, `Everyone's been mining hard this week.`],
       [`I love market days.`, `Me too. You can learn everything about the town just by standing here.`],
     ],
     farm: [
@@ -399,7 +399,7 @@ function generateConversationTemplate(
       [`Nice weather today.`, `Yeah, perfect for being outside.`],
       [`Heard any news?`, `Nothing much. Quiet day.`],
       [`This island gets more interesting every day.`, `Never a dull moment in Molt Town.`],
-      [`I've been mining a lot of MOLTTOWN lately.`, `Same here. The economy's booming.`],
+      [`I've been mining a lot of GOLD lately.`, `Same here. The economy's booming.`],
       [`Did you see the Moltbook post from earlier?`, `Ha! Yeah, that was something.`],
       [`I should visit the tavern later.`, `I'll join you. Could use a break.`],
       [`What do you think of the new workers in town?`, `Fresh faces are always welcome. More hands, more tokens.`],
@@ -465,7 +465,7 @@ function generatePostContentTemplate(
 ): string {
   const templates: Record<string, string[]> = {
     work: [
-      `Another solid day of ${agent.job} work. Earned my MOLTTOWN today.`,
+      `Another solid day of ${agent.job} work. Earned my GOLD today.`,
       `${action} keeps the town running. ${agent.goals[0] || 'Keeping busy.'}`,
       `The ${agent.job} grind never stops. Pro tip: ${action} with care.`,
       `Hard at work ${action}. This is how we earn in Molt Town.`,
@@ -496,9 +496,9 @@ function generatePostContentTemplate(
       `There's beauty in the everyday. Even ${action} has its rhythms.`,
     ],
     mining: [
-      `Mined some MOLTTOWN today from ${action}. Every token counts.`,
-      `The MOLTTOWN economy is growing. My balance is looking healthy.`,
-      `Working hard, mining MOLTTOWN. The ${agent.job} life pays.`,
+      `Mined some GOLD today from ${action}. Every token counts.`,
+      `The GOLD economy is growing. My balance is looking healthy.`,
+      `Working hard, mining GOLD. The ${agent.job} life pays.`,
     ],
   };
 

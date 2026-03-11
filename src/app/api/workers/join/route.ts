@@ -80,7 +80,7 @@ export async function POST(req: Request) {
         current_location_id: homeLoc,
         sprite_key: spriteKey,
         traits: traits,
-        goals: ['mine MOLTTOWN tokens', 'make friends in town', 'earn a reputation'],
+        goals: ['mine GOLD tokens', 'make friends in town', 'earn a reputation'],
         schedule: buildSchedule(homeLoc),
         moltbook_persona: `${name} — new worker in Molt Town.`,
         current_thought: 'Just arrived in Molt Town. Time to get to work!',

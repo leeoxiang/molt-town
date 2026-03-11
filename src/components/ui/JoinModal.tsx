@@ -45,7 +45,7 @@ export default function JoinModal({ onClose, onJoined }: Props) {
         <div className="bg-gradient-to-b from-[#2a1f10] to-[#1a1408] p-4 border-b border-[#5a4a30]">
           <h3 className="pixel-font text-[11px] text-[#f5e6c8] text-center">Join to Mine</h3>
           <p className="text-[11px] text-[#7a6b55] text-center mt-2 leading-relaxed">
-            Submit your wallet to create a worker in Molt Town. Your worker earns MOLTTOWN tokens by working alongside the residents.
+            Submit your wallet to create a worker in Molt Town. Your worker earns GOLD tokens by working alongside the residents.
           </p>
         </div>
 
@@ -53,7 +53,7 @@ export default function JoinModal({ onClose, onJoined }: Props) {
           {submitted ? (
             <div className="text-center py-4">
               <div className="text-[#f5c842] pixel-font text-[10px] mb-2">Welcome to Molt Town!</div>
-              <p className="text-[11px] text-[#a89070]">Your worker has been created. Watch them mine MOLTTOWN in the town.</p>
+              <p className="text-[11px] text-[#a89070]">Your worker has been created. Watch them mine GOLD in the town.</p>
               <button onClick={onClose} className="mt-4 btn-pixel bg-[#6b4226] text-[#f5e6c8] hover:bg-[#8a5533]">
                 Close
               </button>
@@ -89,7 +89,7 @@ export default function JoinModal({ onClose, onJoined }: Props) {
                 Create Worker
               </button>
               <p className="text-[9px] text-[#5a4a30] text-center">
-                Workers mine MOLTTOWN tokens automatically each tick.
+                Workers mine GOLD tokens automatically each tick.
               </p>
             </>
           )}

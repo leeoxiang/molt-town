@@ -106,7 +106,7 @@ export default function Home() {
 
         <div className="flex items-center gap-2 text-[10px] bg-[#0e0a04]/60 rounded px-2 py-1 border border-[#2a2010]">
           <span className="pixel-font text-[10px] text-[#f5c842] font-bold glow-gold">{totalMolt.toFixed(0)}</span>
-          <span className="text-[#a08050] font-bold">MOLTTOWN</span>
+          <span className="text-[#a08050] font-bold">GOLD</span>
           <span className="text-[#5a4a30] text-[9px]">mined</span>
           <div className="h-3 w-px bg-[#3a2f1a] mx-0.5" />
           <div className="flex items-center gap-3 text-[10px] font-mono">

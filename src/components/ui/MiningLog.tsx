@@ -14,7 +14,7 @@ export default function MiningLog({ rewards, agents }: Props) {
     return (
       <div className="flex flex-col items-center justify-center py-8 text-[#5a4a30]">
         <div className="pixel-font text-[9px] text-[#7a6b55] mb-2">No mining activity yet</div>
-        <p className="text-[10px]">Run ticks to see MOLTTOWN earnings</p>
+        <p className="text-[10px]">Run ticks to see GOLD earnings</p>
       </div>
     );
   }

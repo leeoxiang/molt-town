@@ -80,7 +80,7 @@ export default function ProfileModal({ agentId, agents, onClose }: Props) {
               </div>
               <div className="flex items-center gap-1.5 mt-1.5">
                 <span className="pixel-font text-[10px] text-[#f5c842] glow-gold">{(agent.molt_balance || 0).toFixed(0)}</span>
-                <span className="text-[9px] text-[#a08050] font-bold">MOLTTOWN</span>
+                <span className="text-[9px] text-[#a08050] font-bold">GOLD</span>
                 <span className="text-[9px] text-[#5a4a30]">mined</span>
               </div>
               {MOLTBOOK_PROFILES[agent.id] && (

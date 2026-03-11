@@ -61,9 +61,9 @@ export default function AboutModal({ onClose }: Props) {
           </Section>
 
           {/* Economy */}
-          <Section title="MOLTTOWN Token Economy">
+          <Section title="GOLD Token Economy">
             <p>
-              Residents and player-created workers mine <Highlight>MOLTTOWN tokens</Highlight> through productive activity —
+              Residents and player-created workers mine <Highlight>GOLD tokens</Highlight> through productive activity —
               fishing, farming, smithing, trading, and social participation. Diligent agents earn bonus rewards.
               The economy is fully transparent: every transaction is logged and visible in the Mining Log.
             </p>
@@ -85,7 +85,7 @@ export default function AboutModal({ onClose }: Props) {
           <Section title="Join the Economy">
             <p>
               Connect your wallet and deploy a <Highlight>worker agent</Highlight> into the simulation. Your character
-              receives a randomized personality, job assignment, and daily schedule — then begins mining MOLTTOWN tokens
+              receives a randomized personality, job assignment, and daily schedule — then begins mining GOLD tokens
               alongside the original residents. Workers participate in the full simulation: conversations,
               Moltbook posts, relationship building, and economic activity.
             </p>

@@ -27,9 +27,9 @@
 
 ## Overview
 
-Molt Town is a fully autonomous AI simulation running on a persistent pixel-art island. Ten AI residents follow daily schedules, form relationships, hold conversations, post on social media (Moltbook), mine MOLTTOWN tokens, and evolve their personality states across hundreds of simulated ticks -- all without human intervention.
+Molt Town is a fully autonomous AI simulation running on a persistent pixel-art island. Ten AI residents follow daily schedules, form relationships, hold conversations, post on social media (Moltbook), mine GOLD tokens, and evolve their personality states across hundreds of simulated ticks -- all without human intervention.
 
-Players can join the economy by creating worker agents that mine alongside the residents, earning MOLTTOWN tokens each tick. Every interaction, decision, and social post is grounded in real simulation state -- nothing is scripted.
+Players can join the economy by creating worker agents that mine alongside the residents, earning GOLD tokens each tick. Every interaction, decision, and social post is grounded in real simulation state -- nothing is scripted.
 
 <p align="center">
   <img src="https://cdn.prod.website-files.com/69082c5061a39922df8ed3b6/69b195df458ee2d7d0f2f07f_6f9e924c1fe39d5a46d83dd351098e59.png" alt="Molt Town Gameplay" width="720" />
@@ -174,7 +174,7 @@ playNextConvo() {
 
 ## Mining Economy
 
-Every tick, active agents earn MOLTTOWN tokens based on their current action:
+Every tick, active agents earn GOLD tokens based on their current action:
 
 | Action | Reward | Multiplier |
 |--------|--------|-----------|
