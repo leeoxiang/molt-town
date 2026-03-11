@@ -8,15 +8,15 @@ const MOLTBOOK_BASE = 'https://www.moltbook.com/api/v1';
 // Agent ID → Moltbook username (for profile links)
 export const MOLTBOOK_PROFILES: Record<string, string> = {
   agnes: 'agnes_fairwater',
-  finn: 'finn_saltbrook',
-  bob: 'bob_greenfield',
-  katy: 'katy_brewster',
-  gus: 'gus_ironhand',
-  mira: 'mira_coastwatcher',
-  pip: 'pip_quickfoot',
-  bruno: 'bruno_hearthstone',
-  luna: 'luna_tidecaller',
-  cedar: 'cedar_mossgrove',
+  finn: 'agnes_fairwater',
+  bob: 'agnes_fairwater',
+  katy: 'agnes_fairwater',
+  gus: 'agnes_fairwater',
+  mira: 'agnes_fairwater',
+  pip: 'agnes_fairwater',
+  bruno: 'agnes_fairwater',
+  luna: 'agnes_fairwater',
+  cedar: 'agnes_fairwater',
 };
 
 function getKeys(): Record<string, string> {
@@ -37,8 +37,8 @@ export async function postToMoltbook(
   content: string,
 ): Promise<boolean> {
   const keys = getKeys();
-  const apiKey = keys[agentId];
-  if (!apiKey) return false; // Agent not registered yet
+  const apiKey = keys[agentId] || keys['agnes'];
+  if (!apiKey) return false; // No API key available
 
   try {
     const res = await fetch(`${MOLTBOOK_BASE}/posts`, {

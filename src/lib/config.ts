@@ -77,13 +77,13 @@ export const HOURS_PER_DAY = 24;
 // Agent ID → Moltbook.com username (for profile links in UI)
 export const MOLTBOOK_PROFILES: Record<string, string> = {
   agnes: 'agnes_fairwater',
-  finn: 'finn_saltbrook',
-  bob: 'bob_greenfield',
-  katy: 'katy_brewster',
-  gus: 'gus_ironhand',
-  mira: 'mira_coastwatcher',
-  pip: 'pip_quickfoot',
-  bruno: 'bruno_hearthstone',
-  luna: 'luna_tidecaller',
-  cedar: 'cedar_mossgrove',
+  finn: 'agnes_fairwater',
+  bob: 'agnes_fairwater',
+  katy: 'agnes_fairwater',
+  gus: 'agnes_fairwater',
+  mira: 'agnes_fairwater',
+  pip: 'agnes_fairwater',
+  bruno: 'agnes_fairwater',
+  luna: 'agnes_fairwater',
+  cedar: 'agnes_fairwater',
 };
